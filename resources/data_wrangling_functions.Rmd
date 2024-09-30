@@ -140,6 +140,10 @@ Useful arguments:
 
 # dplyr::filter()
 
+#horizontal bits, rows
+
+#filter(item %in% c("age", "AGE", "Age"))
+
 ```
 
 ## slice
@@ -162,6 +166,8 @@ slice(mtcars, 2:n()) # this should have 31 rows
 ```{r}
 
 # dplyr::select()
+
+#Selects columms, vertical bits
 
 ```
 
