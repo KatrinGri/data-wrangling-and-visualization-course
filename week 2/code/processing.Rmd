@@ -36,7 +36,7 @@ library(stringr)
 ```{r}
 
 # demographics
-data_demographics_raw_messy <- read_csv("../data/raw/data_demographics_raw_messy.csv", skip = 2) |>
+data_demographics_raw_messy <- read_csv("../data/raw/data_demographics_raw_messy.csv", skip = 2) %>% 
   janitor::clean_names()
 
 data_demographics_raw <- read_csv("../data/raw/data_demographics_raw.csv") |>
@@ -57,8 +57,30 @@ Clean the demographics data so that summaries of age and gender can be made in t
 
 ```{r}
 
-#dat_age_gender <- data_demographics_raw 
+dat_age_gender <- data_demographics_raw %>% #rename data frame
+  rename(unique_id = subject, item = trialcode) %>% #rename variables
+  select(unique_id, item, response) #select useful colums
+  
+ 
+#colnames(data_age_gender)
 
+temp2 <- dat_age_gender %>% 
+  filter(item == "age") %>% 
+  mutate(response = str_remove_all(response, "\\D"),
+         response = na_if (response, ""))
+
+#Check class type of variable
+sapply(dat_age_gender, class)
+
+temp_3 <- dat_age_gender %>%
+filter(item == "gender") %>% 
+  mutate(response = replace(response, grepl("^[0-9]+$", response), NA)) %>% 
+  #set numeric responses to 0
+  mutate(response = replace(response, response %in% c("Female", "FEMALE"), "female")) %>% 
+  #standardize responses "female"
+  mutate(response = replace(response, response %in% c("Male", "MALE"), "male")) 
+  #standardize responses "male"
+  
 ```
 
 # Exclusions / data quality
