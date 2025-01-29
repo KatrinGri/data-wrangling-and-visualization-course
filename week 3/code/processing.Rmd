@@ -86,9 +86,85 @@ dat_gender <- data_demographics_raw |>
   # remove non-numbers or decimals from age
   mutate(gender = str_to_lower(gender),
          gender = str_remove_all(gender, "[\\d.]"),
-         gender = na_if(gender, "")) |>
+         gender = na_if(gender, ""), 
+         gender = case_when(gender == "woman" ~ "female",
+                            gender == "yes" ~ NA_character_,
+                            gender == "man" ~ "male",
+                            gender == "girl" ~ "female",
+                            gender == "dude" ~ "male",
+                            gender == "non binary" ~ "non-binary",
+                            TRUE ~ gender)) |>
   select(unique_id, gender)
-  #select(-item) # alternative: negative selection
+
+```
+
+```{r}
+
+# do we have duplicate data?
+data_demographics_raw |>
+  count(subject) |>
+  arrange(desc(n))
+
+# yes - n is different for some subjects
+
+
+dat_unique_id <- data_demographics_raw |>
+  rename(unique_id = subject) |>
+  filter(unique_id != "246532124") # == means must be equal; != means must not be;
+  #filter(!gender %in% c("male", "female", "non-binary"))
+  
+# multi-line typing: option-mouse drag on mac, alt-mouse drag on windows
+  
+```
+
+## Combine
+
+```{r}
+
+# dat_gender |>
+#   count(gender) |>
+#   arrange(desc(n))
+# 
+# # dangerous - dont use as it assumes row order is equivalent
+# # data_age_gender <- 
+# #   bind_cols(dat_age,
+# #             dat_gender)
+# 
+# 
+# data_age_gender <-
+#   full_join(dat_age |> slice(1:50),
+#             dat_gender, 
+#             by = "unique_id")
+# 
+# 
+
+
+age_temp <- dat_age |> slice(1:50)
+
+data_age_gender <-
+  full_join(x = age_temp,
+            y = dat_gender, 
+            by = "unique_id")
+
+data_age_gender <-
+  left_join(x = age_temp,
+            y = dat_gender, 
+            by = "unique_id")
+
+data_age_gender <-
+  right_join(x = age_temp,
+            y = dat_gender, 
+            by = "unique_id")
+
+data_age_gender <-
+  inner_join(x = age_temp,
+            y = dat_gender, 
+            by = "unique_id")
+
+data_age_gender <-
+  semi_join(x = age_temp,
+            y = dat_gender, 
+            by = "unique_id")
 
 ```
 
@@ -168,5 +244,6 @@ Flag all duplicates for exclusion.
 sessionInfo()
 
 ```
+
 
 
